@@ -7,7 +7,6 @@ import 'package:friendly_card_teacher/screens/question/question_managment_screen
 import 'package:friendly_card_teacher/screens/user/user_information_screen.dart';
 import 'package:friendly_card_teacher/screens/vocabulary/vocabulary_managment_screen.dart';
 import 'package:friendly_card_teacher/utils/inital_binding.dart';
-import 'package:friendly_card_teacher/views/admin/admin_page.dart';
 import 'package:friendly_card_teacher/views/login_page.dart';
 import 'package:friendly_card_teacher/screens/teacher/teacher_form_screen.dart';
 import 'package:friendly_card_teacher/views/teacher/teacher_page.dart';
@@ -62,7 +61,6 @@ class MyApp extends StatelessWidget {
           page: () => const UserInformationScreen(),
           // binding:
         ),
-        GetPage(name: '/admin', page: () => const AdminPage()),
         GetPage(name: '/teacher', page: () => const TeacherPage()),
         GetPage(name: '/teacher_form', page: () => const TeacherFormScreen()),
         GetPage(

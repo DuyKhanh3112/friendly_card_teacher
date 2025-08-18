@@ -121,7 +121,7 @@ class DrawerTeacher extends StatelessWidget {
                     title: Text(
                       'Đăng xuất',
                       style: TextStyle(
-                        color: AppColor.blue,
+                        color: AppColor.warm,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
