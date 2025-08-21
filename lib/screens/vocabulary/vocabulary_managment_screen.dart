@@ -1,6 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member, avoid_unnecessary_containers, sized_box_for_whitespace, deprecated_member_use, sort_child_properties_last, prefer_const_constructors
 
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flexible_grid_view/flexible_grid_view.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'package:friendly_card_teacher/utils/app_color.dart';
 import 'package:friendly_card_teacher/utils/tool.dart';
 import 'package:friendly_card_teacher/widget/loading_page.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 // import 'package:image_picker_web/image_picker_web.dart';
 // import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -351,7 +352,7 @@ class VocabularyManagmentScreen extends StatelessWidget {
     UsersController usersController = Get.find<UsersController>();
     final formKey = GlobalKey<FormState>();
 
-    RxString imgBase64 = ''.obs;
+    RxString filePath = ''.obs;
     RxString imgUrl = vocabularyController.vocabulary.value.image.obs;
 
     TextEditingController nameController = TextEditingController(
@@ -468,11 +469,12 @@ class VocabularyManagmentScreen extends StatelessWidget {
                         onTap: usersController.user.value.role != 'teacher'
                             ? null
                             : () async {
-                                // var result =
-                                //     await ImagePickerWeb.getImageAsBytes();
-                                // if (result != null) {
-                                //   imgBase64.value = base64Encode(result);
-                                // }
+                                var result = await ImagePicker().pickImage(
+                                  source: ImageSource.gallery,
+                                );
+                                if (result != null) {
+                                  filePath.value = result.path;
+                                }
                               },
                         child: Column(
                           children: [
@@ -486,18 +488,16 @@ class VocabularyManagmentScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(32),
                                 ),
-                                image:
-                                    vocabularyController.vocabulary.value.id ==
-                                        ''
-                                    ? imgBase64.value == ''
+                                image: topicController.topic.value.id == ''
+                                    ? filePath.value == ''
                                           ? null
                                           : DecorationImage(
-                                              image: MemoryImage(
-                                                base64Decode(imgBase64.value),
+                                              image: FileImage(
+                                                File(filePath.value),
                                               ),
                                               fit: BoxFit.cover,
                                             )
-                                    : imgBase64.value == ''
+                                    : filePath.value == ''
                                     ? imgUrl.value == ''
                                           ? null
                                           : DecorationImage(
@@ -505,9 +505,7 @@ class VocabularyManagmentScreen extends StatelessWidget {
                                               fit: BoxFit.cover,
                                             )
                                     : DecorationImage(
-                                        image: MemoryImage(
-                                          base64Decode(imgBase64.value),
-                                        ),
+                                        image: FileImage(File(filePath.value)),
                                         fit: BoxFit.cover,
                                       ),
                                 color: Colors.white,
@@ -597,7 +595,7 @@ class VocabularyManagmentScreen extends StatelessWidget {
                                       await vocabularyController
                                           .createVocabulary(
                                             voca,
-                                            imgBase64.value,
+                                            filePath.value,
                                           );
                                       await vocabularyController
                                           .loadVocabularyTopic();
@@ -634,7 +632,7 @@ class VocabularyManagmentScreen extends StatelessWidget {
                                           'await';
                                       Get.back();
                                       await vocabularyController
-                                          .updateVocabulary(imgBase64.value);
+                                          .updateVocabulary(filePath.value);
                                     }
                                     vocabularyController.vocabulary.value =
                                         Vocabulary.initVocabulary();

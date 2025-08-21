@@ -59,14 +59,14 @@ class VocabularyController extends GetxController {
     }
   }
 
-  Future<void> createVocabulary(Vocabulary item, String imgBase64) async {
+  Future<void> createVocabulary(Vocabulary item, String img) async {
     loading.value = true;
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
     String id = vocabularyCollection.doc().id;
-    if (imgBase64 != '') {
-      String imgUrl = await CloudinaryController().uploadImage(
-        imgBase64,
+    if (img != '') {
+      String imgUrl = await CloudinaryController().uploadImageFile(
+        img,
         id,
         'topic/${item.topic_id}/vocabulary',
       );
@@ -148,11 +148,11 @@ class VocabularyController extends GetxController {
     loading.value = false;
   }
 
-  Future<void> updateVocabulary(String imgBase64) async {
+  Future<void> updateVocabulary(String img) async {
     loading.value = true;
-    if (imgBase64 != '') {
-      String imgUrl = await CloudinaryController().uploadImage(
-        imgBase64,
+    if (img != '') {
+      String imgUrl = await CloudinaryController().uploadImageFile(
+        img,
         vocabulary.value.id,
         'topic/${vocabulary.value.topic_id}/vocabulary',
       );

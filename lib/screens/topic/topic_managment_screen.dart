@@ -477,15 +477,6 @@ class TopicManagmentScreen extends StatelessWidget {
                                   if (result != null) {
                                     filePath.value = result.path;
                                   }
-                                  // if (kIsWeb) {
-                                  //   var result =
-                                  //       await ImagePickerWeb.getImageAsBytes();
-                                  //   if (result != null) {
-                                  //     imgBase64.value = base64Encode(result);
-                                  //   }
-                                  // } else {
-                                  //   //saif image picker
-                                  // }
                                 },
                           child: Container(
                             height: Get.height * 0.25,
