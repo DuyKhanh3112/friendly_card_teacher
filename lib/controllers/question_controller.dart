@@ -63,27 +63,12 @@ class QuestionController extends GetxController {
     loading.value = false;
   }
 
-  Future<int> countQuestionStatus(String status) async {
-    if (Get.find<UsersController>().user.value.role == 'admin') {
-      var snapshoot = await questionCollection
-          .where('status', isEqualTo: status)
-          .get();
-      return snapshoot.docs.length;
-    } else {
-      if (Get.find<TopicController>().listTopics.isEmpty) {
-        return 0;
-      }
-      var snapshoot = await questionCollection
-          .where('status', isEqualTo: status)
-          .where(
-            'topic_id',
-            whereIn: Get.find<TopicController>().listTopics.value.map(
-              (t) => t.id,
-            ),
-          )
-          .get();
-      return snapshoot.docs.length;
-    }
+  Future<int> countQuestionStatus(String status, String topicId) async {
+    var snapshoot = await questionCollection
+        .where('status', isEqualTo: status)
+        .where('topic_id', isEqualTo: topicId)
+        .get();
+    return snapshoot.docs.length;
   }
 
   Future<void> loadOption() async {

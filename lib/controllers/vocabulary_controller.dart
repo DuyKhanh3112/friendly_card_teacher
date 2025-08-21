@@ -36,37 +36,22 @@ class VocabularyController extends GetxController {
     loading.value = false;
   }
 
-  Future<int> countVocabularyByStatus(String status) async {
-    if (Get.find<UsersController>().user.value.role == 'admin') {
-      var snapshoot = await vocabularyCollection
-          .where('status', isEqualTo: status)
-          .get();
-      return snapshoot.docs.length;
-    } else {
-      if (Get.find<TopicController>().listTopics.isEmpty) {
-        return 0;
-      }
-      var snapshoot = await vocabularyCollection
-          .where('status', isEqualTo: status)
-          .where(
-            'topic_id',
-            whereIn: Get.find<TopicController>().listTopics.value.map(
-              (t) => t.id,
-            ),
-          )
-          .get();
-      return snapshoot.docs.length;
-    }
+  Future<int> countVocabularyByStatus(String status, String topicID) async {
+    var snapshoot = await vocabularyCollection
+        .where('status', isEqualTo: status)
+        .where('topic_id', isEqualTo: topicID)
+        .get();
+    return snapshoot.docs.length;
   }
 
-  Future<void> createVocabulary(Vocabulary item, String img) async {
+  Future<void> createVocabulary(Vocabulary item, String imgBase64) async {
     loading.value = true;
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
     String id = vocabularyCollection.doc().id;
-    if (img != '') {
-      String imgUrl = await CloudinaryController().uploadImageFile(
-        img,
+    if (imgBase64 != '') {
+      String imgUrl = await CloudinaryController().uploadImage(
+        imgBase64,
         id,
         'topic/${item.topic_id}/vocabulary',
       );
@@ -148,11 +133,11 @@ class VocabularyController extends GetxController {
     loading.value = false;
   }
 
-  Future<void> updateVocabulary(String img) async {
+  Future<void> updateVocabulary(String imgBase64) async {
     loading.value = true;
-    if (img != '') {
-      String imgUrl = await CloudinaryController().uploadImageFile(
-        img,
+    if (imgBase64 != '') {
+      String imgUrl = await CloudinaryController().uploadImage(
+        imgBase64,
         vocabulary.value.id,
         'topic/${vocabulary.value.topic_id}/vocabulary',
       );

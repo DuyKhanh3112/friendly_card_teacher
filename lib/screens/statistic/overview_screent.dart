@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, invalid_use_of_protected_member, sized_box_for_whitespace, deprecated_member_use, unrelated_type_equality_checks, avoid_unnecessary_containers, avoid_function_literals_in_foreach_calls
 
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +28,13 @@ class OverviewScreen extends StatelessWidget {
           ? const LoadingPage()
           : Scaffold(
               body: ListView(
-                padding: EdgeInsets.symmetric(horizontal: Get.width * 0.02),
+                padding: EdgeInsets.symmetric(
+                  horizontal: Get.width * 0.02,
+                  vertical: Get.height * 0.025,
+                ),
                 children: [
                   Container(
-                    margin: EdgeInsets.only(top: Get.height * 0.025),
+                    // margin: EdgeInsets.only(top: Get.height * 0.025),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -99,8 +103,20 @@ class OverviewScreen extends StatelessWidget {
                                       ],
                                     ),
                                     child: _buildBarChart(
+                                      context,
                                       overviewController.barGroupTeacher.value,
                                       'Giáo viên',
+                                      [
+                                        {
+                                          'value': 'active',
+                                          'label': 'Đàng hoạt động',
+                                        },
+                                        {
+                                          'value': 'active',
+                                          'label': 'Đã bị khóa',
+                                        },
+                                      ],
+                                      false,
                                     ),
                                   ),
                                 ],
@@ -136,8 +152,11 @@ class OverviewScreen extends StatelessWidget {
                                   ],
                                 ),
                                 child: _buildBarChart(
+                                  context,
                                   overviewController.barGroupTopic.value,
-                                  'Giáo viên',
+                                  'Chủ đề',
+                                  Tool.listStatus,
+                                  false,
                                 ),
                               ),
                             ],
@@ -171,8 +190,18 @@ class OverviewScreen extends StatelessWidget {
                                   ],
                                 ),
                                 child: _buildBarChart(
+                                  context,
                                   overviewController.barGroupVocabulary.value,
                                   'Từ vựng',
+                                  Get.find<TopicController>().listTopics.value
+                                      .map(
+                                        (topic) => {
+                                          'value': topic.id,
+                                          'label': topic.name,
+                                        },
+                                      )
+                                      .toList(),
+                                  true,
                                 ),
                               ),
                             ],
@@ -206,8 +235,18 @@ class OverviewScreen extends StatelessWidget {
                                   ],
                                 ),
                                 child: _buildBarChart(
+                                  context,
                                   overviewController.barGroupQuestion.value,
                                   'Câu hỏi',
+                                  Get.find<TopicController>().listTopics.value
+                                      .map(
+                                        (topic) => {
+                                          'value': topic.id,
+                                          'label': topic.name,
+                                        },
+                                      )
+                                      .toList(),
+                                  true,
                                 ),
                               ),
                             ],
@@ -305,15 +344,17 @@ class OverviewScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        // color: AppColor.drakBlue,
-      ),
+      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget _buildBarChart(List<BarChartGroupData> barGroups, String unit) {
+  Widget _buildBarChart(
+    BuildContext context,
+    List<BarChartGroupData> barGroups,
+    String unit,
+    List<dynamic> listTitle,
+    bool showNote,
+  ) {
     double maxY = 0;
     double interval = 2;
     barGroups.forEach((item) {
@@ -323,113 +364,167 @@ class OverviewScreen extends StatelessWidget {
     });
 
     // maxY = maxY % (interval) == 0 ? (maxY + 2) : (maxY + 3);
-    if (maxY > 30) {
+    if (maxY >= 30) {
       interval = 5;
+    }
+    if (maxY >= 50) {
+      interval = 10;
+    }
+    if (maxY >= 100) {
+      interval = 20;
+    }
+    if (maxY >= 500) {
+      interval = 50;
+    }
+    if (maxY >= 1000) {
+      interval = 100;
     }
     maxY = maxY % (interval) == 0
         ? maxY + interval
         : (maxY + 2 * interval - maxY % interval);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: barGroups.length * Get.width * 0.2 > Get.width
-            ? barGroups.length * Get.width * 0.2
-            : Get.width,
-        height: maxY * Get.height * 0.015 > 400
-            ? maxY * Get.height * 0.015
-            : 400,
-        padding: EdgeInsets.only(
-          top: Get.height * 0.03,
-          left: Get.width * 0.0125,
-          right: Get.width * 0.125,
-          bottom: Get.height * 0.05,
-        ),
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceAround,
-            maxY: maxY,
 
-            barTouchData: BarTouchData(
-              touchTooltipData: BarTouchTooltipData(
-                // tooltipBgColor: Colors.blueGrey,
-                tooltipPadding: EdgeInsets.all(5),
-                maxContentWidth: Get.width * 0.4,
-                getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                  var title = Tool.listStatus[group.x]['label'];
-                  if (barGroups.length == 2) {
-                    title = group.x == 0 ? 'Đang hoạt động' : "Đã bị khóa";
-                  }
-                  return BarTooltipItem(
-                    '${rod.toY.toInt()} ${unit.toLowerCase()} ${title.toString().toLowerCase()}',
-                    TextStyle(
-                      color: AppColor.labelBlue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  );
-                },
-              ),
-            ),
-            titlesData: FlTitlesData(
-              show: true,
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    var title = Tool.listStatus[value.toInt()]['label'];
-                    if (barGroups.length == 2) {
-                      title = value.toInt() == 0
-                          ? 'Đang hoạt động'
-                          : "Đã bị khóa";
-                    }
-                    return Container(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+    return Column(
+      children: [
+        showNote
+            ? Container(
+                margin: EdgeInsets.all(Get.width * 0.01),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: Tool.listStatus
+                      .map(
+                        (status) => Container(
+                          width: Get.width * 0.25,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: Get.width * 0.025,
+                                height: Get.width * 0.025,
+
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: Get.width * 0.005,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: status['color'],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Text(
+                                status['label'],
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: status['color'],
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    );
-                  },
+                      )
+                      .toList(),
                 ),
+              )
+            : SizedBox(),
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: barGroups.length * Get.width * 0.2 > Get.width
+                  ? barGroups.length * Get.width * 0.2
+                  : Get.width,
+              height: maxY / interval * Get.height * 0.05 > 400
+                  ? maxY / interval * Get.height * 0.05
+                  : 400,
+              padding: EdgeInsets.only(
+                top: Get.height * 0.03,
+                left: Get.width * 0.0125,
+                right: Get.width * 0.125,
+                bottom: Get.height * 0.05,
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 50,
-                  interval: interval,
-                  getTitlesWidget: (value, meta) => Text(
-                    value.toInt().toString(),
-                    style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: maxY,
+
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      // tooltipBgColor: Colors.blueGrey,
+                      tooltipPadding: EdgeInsets.all(5),
+                      maxContentWidth: Get.width * 0.4,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        return BarTooltipItem(
+                          '${rod.toY.toInt()} ${unit.toUpperCase()}',
+                          TextStyle(
+                            color: AppColor.labelBlue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        );
+                      },
                     ),
                   ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          var title = listTitle[value.toInt()];
+
+                          return Container(
+                            child: Text(
+                              title['label'],
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 50,
+                        interval: interval,
+                        getTitlesWidget: (value, meta) => Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: interval,
+                    getDrawingHorizontalLine: (value) =>
+                        FlLine(color: Colors.grey.shade300, strokeWidth: 1),
+                  ),
+                  barGroups: barGroups,
                 ),
               ),
             ),
-            borderData: FlBorderData(show: false),
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              horizontalInterval: interval,
-              getDrawingHorizontalLine: (value) =>
-                  FlLine(color: Colors.grey.shade300, strokeWidth: 1),
-            ),
-            barGroups: barGroups,
           ),
         ),
-      ),
+      ],
     );
   }
 }

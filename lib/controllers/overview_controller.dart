@@ -90,67 +90,109 @@ class OverviewController extends GetxController {
     countVocabulary.value = 0;
     barGroupVocabulary.value = [];
 
-    // Collect counts for each status asynchronously
-    List<int> countVoca = await Future.wait(
-      Tool.listStatus.map(
-        (status) => Get.find<VocabularyController>().countVocabularyByStatus(
-          status['value'],
+    Get.find<TopicController>().listTopics.value.forEach((topic) async {
+      List<int> countVoca = await Future.wait(
+        Tool.listStatus.map(
+          (status) => Get.find<VocabularyController>().countVocabularyByStatus(
+            status['value'],
+            topic.id,
+          ),
         ),
-      ),
-    );
+      );
+      barGroupVocabulary.value.add(
+        BarChartGroupData(
+          x: Get.find<TopicController>().listTopics.value.indexOf(topic),
+          barRods: Tool.listStatus
+              .asMap()
+              .entries
+              .where((entry) => countVoca[entry.key] > 0) // chỉ lấy count > 0
+              .map((entry) {
+                final index = entry.key;
+                final status = entry.value;
+                final count = countVoca[index];
+                countVocabulary.value += count;
 
-    // Build BarChartGroupData synchronously using the collected counts
-    barGroupVocabulary.value.addAll(
-      List.generate(Tool.listStatus.length, (index) {
-        final status = Tool.listStatus[index];
-        final count = countVoca[index];
-        countVocabulary.value += count;
-        return BarChartGroupData(
-          x: index,
-          barRods: [
-            BarChartRodData(
-              toY: count.toDouble(),
-              width: Get.width * 0.1,
-              color: status['color'],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
-              ),
-            ),
-          ],
-        );
-      }),
-    );
+                return BarChartRodData(
+                  toY: count.toDouble(),
+                  width: Get.width * 0.05,
+                  color: status['color'],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4),
+                  ),
+                );
+              })
+              .toList(),
+        ),
+      );
+    });
 
     countQuestion.value = 0;
     barGroupQuestion.value = [];
-    List<int> countQuest = await Future.wait(
-      Tool.listStatus.map(
-        (status) =>
-            Get.find<QuestionController>().countQuestionStatus(status['value']),
-      ),
-    );
-    barGroupQuestion.value.addAll(
-      List.generate(Tool.listStatus.length, (index) {
-        final status = Tool.listStatus[index];
-        final count = countQuest[index];
-        countQuestion.value += count;
-        return BarChartGroupData(
-          x: index,
-          barRods: [
-            BarChartRodData(
-              toY: count.toDouble(),
-              width: Get.width * 0.1,
-              color: status['color'],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
-              ),
-            ),
-          ],
-        );
-      }),
-    );
+    Get.find<TopicController>().listTopics.value.forEach((topic) async {
+      List<int> countQues = await Future.wait(
+        Tool.listStatus.map(
+          (status) => Get.find<QuestionController>().countQuestionStatus(
+            status['value'],
+            topic.id,
+          ),
+        ),
+      );
+      barGroupQuestion.value.add(
+        BarChartGroupData(
+          x: Get.find<TopicController>().listTopics.value.indexOf(topic),
+          barRods: Tool.listStatus
+              .asMap()
+              .entries
+              .where((entry) => countQues[entry.key] > 0) // chỉ lấy count > 0
+              .map((entry) {
+                final index = entry.key;
+                final status = entry.value;
+                final count = countQues[index];
+                countQuestion.value += count;
+
+                return BarChartRodData(
+                  toY: count.toDouble(),
+                  width: Get.width * 0.05,
+                  color: status['color'],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4),
+                  ),
+                );
+              })
+              .toList(),
+        ),
+      );
+    });
+
+    // List<int> countQuest = await Future.wait(
+    //   Tool.listStatus.map(
+    //     (status) =>
+    //         Get.find<QuestionController>().countQuestionStatus(status['value']),
+    //   ),
+    // );
+    // barGroupQuestion.value.addAll(
+    //   List.generate(Tool.listStatus.length, (index) {
+    //     final status = Tool.listStatus[index];
+    //     final count = countQuest[index];
+    //     countQuestion.value += count;
+    //     return BarChartGroupData(
+    //       x: index,
+    //       barRods: [
+    //         BarChartRodData(
+    //           toY: count.toDouble(),
+    //           width: Get.width * 0.1,
+    //           color: status['color'],
+    //           borderRadius: const BorderRadius.only(
+    //             topLeft: Radius.circular(4),
+    //             topRight: Radius.circular(4),
+    //           ),
+    //         ),
+    //       ],
+    //     );
+    //   }),
+    // );
 
     loading.value = false;
   }
