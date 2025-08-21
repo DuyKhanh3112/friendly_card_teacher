@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friendly_card_teacher/config.dart';
 import 'package:friendly_card_teacher/controllers/cloudinary_controller.dart';
 import 'package:friendly_card_teacher/controllers/topic_controller.dart';
-import 'package:friendly_card_teacher/controllers/users_controller.dart';
 import 'package:friendly_card_teacher/models/vocabulary.dart';
 import 'package:friendly_card_teacher/utils/tool.dart';
 import 'package:get/get.dart';

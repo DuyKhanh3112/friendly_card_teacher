@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:friendly_card_teacher/config.dart';
 import 'package:friendly_card_teacher/controllers/topic_controller.dart';
-import 'package:friendly_card_teacher/controllers/users_controller.dart';
 import 'package:friendly_card_teacher/controllers/vocabulary_controller.dart';
 import 'package:friendly_card_teacher/models/option.dart';
 import 'package:friendly_card_teacher/models/question.dart';
