@@ -10,9 +10,10 @@ class Config {
   static List<Map<String, String>> listRole = [
     {'value': 'admin', 'label': 'Quản trị viên'},
     {'value': 'teacher', 'label': 'Giáo viên chuyên môn'},
-    {'value': 'learner', 'label': 'Người học'}
+    {'value': 'learner', 'label': 'Người học'},
   ];
-  static String API_KEY = 'AIzaSyDB_IG4rGYmaFGxjJcny3sepz-yTwa29sw';
+  static String API_KEY = 'AIzaSyDpyCwu0-bstmIRunmxVGkvaAurN1vpo8c';
+  // 'AIzaSyDB_IG4rGYmaFGxjJcny3sepz-yTwa29sw';
   static String API_KEY_PEXELS =
       'xmmmP7bh7PzHk1tYtNiZdq14KCGOsP4kuO9nyhwNS00jbSqZJHIFzJ6w';
 }

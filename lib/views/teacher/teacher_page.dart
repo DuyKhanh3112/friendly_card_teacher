@@ -47,6 +47,8 @@ class TeacherPage extends StatelessWidget {
                           return;
                         }
                         if (value == 'change_pass') {
+                          usersController.userId.value =
+                              usersController.user.value.id;
                           usersController.changePassword(context);
                           return;
                         }

@@ -49,7 +49,7 @@ class VocabularyController extends GetxController {
 
     String id = vocabularyCollection.doc().id;
     if (imgBase64 != '') {
-      String imgUrl = await CloudinaryController().uploadImage(
+      String imgUrl = await CloudinaryController().uploadImageFile(
         imgBase64,
         id,
         'topic/${item.topic_id}/vocabulary',
@@ -135,7 +135,7 @@ class VocabularyController extends GetxController {
   Future<void> updateVocabulary(String imgBase64) async {
     loading.value = true;
     if (imgBase64 != '') {
-      String imgUrl = await CloudinaryController().uploadImage(
+      String imgUrl = await CloudinaryController().uploadImageFile(
         imgBase64,
         vocabulary.value.id,
         'topic/${vocabulary.value.topic_id}/vocabulary',

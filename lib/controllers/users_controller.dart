@@ -1,4 +1,4 @@
-// ignore_for_file: sized_box_for_whitespace
+// ignore_for_file: sized_box_for_whitespace, use_build_context_synchronously
 
 import 'dart:async';
 
@@ -108,8 +108,8 @@ class UsersController extends GetxController {
     var snapshot = await usersCollection
         .where('email', isEqualTo: email)
         .where('username', isEqualTo: username)
-        .where('role', isEqualTo: 'learner')
-        .where('active', isEqualTo: true)
+        .where('role', isEqualTo: 'teacher')
+        // .where('active', isEqualTo: true)
         .get();
     if (snapshot.docs.isEmpty) {
       loading.value = false;
@@ -265,6 +265,7 @@ class UsersController extends GetxController {
                             Get.back();
 
                             // changePassword(passConfController.text);
+                            await updatePassword(passConfController.text);
 
                             await showAlertDialog(
                               context,
@@ -523,5 +524,12 @@ class UsersController extends GetxController {
         ],
       ),
     );
+  }
+
+  Future<void> updatePassword(String password) async {
+    loading.value = true;
+    await usersCollection.doc(userId.value).update({'password': password});
+    user.value.password = password;
+    loading.value = false;
   }
 }

@@ -257,7 +257,7 @@ class LoginPage extends StatelessWidget {
                             unameController.text,
                             emailController.text,
                           )) {
-                            Get.back();
+                            // Get.back();
                             await formOTP(context);
                           } else {
                             showAlertDialog(
@@ -497,6 +497,9 @@ class LoginPage extends StatelessWidget {
 
                             // await usersController
                             //     .changePassword(passConfController.text);
+                            await Get.find<UsersController>().updatePassword(
+                              passwordController.text,
+                            );
 
                             await showAlertDialog(
                               context,
